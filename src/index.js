@@ -45,24 +45,36 @@ fetch("http://localhost:3000/toys")
 
 function submitToys(e){
   e.preventDefault()
+  const name = document.getAttribute("name")
+  const image = document.getAttribute("image")
   let toyObject = {
     name:e.target.name.value,
-    image:e.target.image.value
+    image:e.target.image.value,
   }
   addElements(toyObject)
-  addToys(toyObject)
 }
 
-function addToys(toyObject){
-  fetch('http://localhost:3000/toys', {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json"
-    },
-    body: JSON.stringify(toyObject)
+function toyEvent(){
+  const newToyButton = document.querySelector(".submit")
+  newToyButton.addEventListener("submit", (event) => {
+  submitToys(event)
   })
-  .then(response => response.json())
-  .then(toy => console.log(toy))
 }
 
+fetch('http://localhost:3000/toys', {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json"
+  },
+  body: JSON.stringify(toyObject)
+})
+.then(response => response.json())
+.then(toy => addToy(toy))
+
+
+
+// document.addEventListener("submit", () => {
+//   const submit = document.querySelector(".submit")
+//   addToys(submit)
+// })

@@ -21,7 +21,6 @@ fetch("http://localhost:3000/toys")
  }))
 
  function addElements(element){
-   console.log(element)
   let toyCollection = document.getElementById("toy-collection")
   let toyCard = document.createElement("div")
   toyCard.className = "card"
@@ -39,38 +38,52 @@ fetch("http://localhost:3000/toys")
   toyCard.appendChild(button)
   button.className = "button"
   button.id = `${element.id}`
-  button.innerHTML = `<button class = "like-btn" id = ${element.id}> Like &hearts; </button>`
+  button.innerHTML = `Like &hearts;`
+  button.addEventListener("click", (e) => { 
+    addLikes(element.id, e, p)
+  })
   toyCollection.appendChild(toyCard)
 }
 
 function submitToys(e){
   e.preventDefault()
-  const name = document.getAttribute("name")
-  const image = document.getAttribute("image")
   let toyObject = {
     name:e.target.name.value,
     image:e.target.image.value,
+    likes:0
   }
-  addElements(toyObject)
-}
-
-function toyEvent(){
-  const newToyButton = document.querySelector(".submit")
-  newToyButton.addEventListener("submit", (event) => {
-  submitToys(event)
+  fetch('http://localhost:3000/toys', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify(toyObject)
   })
+  .then(response => response.json())
+  .then(toy => addElements(toy))
 }
 
-fetch('http://localhost:3000/toys', {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json"
-  },
-  body: JSON.stringify(toyObject)
+const newToyForm = document.querySelector(".add-toy-form")
+newToyForm.addEventListener("submit", (event) => {
+  submitToys(event)
 })
-.then(response => response.json())
-.then(toy => addToy(toy))
+
+function addLikes(id, e, p){
+  e.preventDefault()
+console.log('id', id)
+  fetch(`http://localhost:3000/toys/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({likes: ++p.innerText})
+  })
+  .then(response => response.json())
+  .then(toy => {p.innerText = toy.likes
+  console.log(toy)})
+}
 
 
 
